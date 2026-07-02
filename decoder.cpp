@@ -5,6 +5,8 @@
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
 
+#include <algorithm> //std::fill(), not sourced by default on macOS with C++23
+
 #include "flic.h"
 #include "flic_details.h"
 
