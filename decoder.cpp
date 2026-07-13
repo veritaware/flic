@@ -1,6 +1,7 @@
-// Aseprite FLIC Library
-// Copyright (c) 2019-2020 Igara Studio S.A.
-// Copyright (c) 2015 David Capello
+// FLIC Library
+// Copyright (C) 2015      David Capello
+// Copyright (C) 2019-2020 Igara Studio S.A.
+// Copyright (C) 2026      Veritaware
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
