@@ -144,7 +144,7 @@ void Encoder::writeFrame(const Frame& frame)
     ++nchunks;
 
     // Create the buffer to store previous frame pixels
-    m_prevFrameData.resize(m_height*frame.rowstride);
+    m_prevFrameData.resize(static_cast<size_t>(m_height) * frame.rowstride);
     std::copy(frame.pixels,
               frame.pixels+m_height*frame.rowstride,
               m_prevFrameData.begin());
@@ -316,9 +316,9 @@ void Encoder::writeLcChunk(const Frame& frame)
 {
   int skipLines = 0;
   for (int y=0; y<m_height; ++y) {
-    std::vector<uint8_t>::iterator prevIt =
-      m_prevFrameData.begin() + y*frame.rowstride;
-    uint8_t* it = frame.pixels + y*frame.rowstride;
+    const size_t stride = static_cast<size_t>(y) * frame.rowstride;
+    std::vector<uint8_t>::iterator prevIt = m_prevFrameData.begin() + stride;
+    uint8_t* it = frame.pixels + stride;
 
     for (int x=0; x<m_width; ++x, ++it, ++prevIt) {
       if (*prevIt != *it)
@@ -332,9 +332,9 @@ firstScanDone:;
 
   int skipEndLines = 0;
   for (int y=m_height-1; y > skipLines; --y) {
-    std::vector<uint8_t>::iterator prevIt =
-      m_prevFrameData.begin() + y*frame.rowstride;
-    uint8_t* it = frame.pixels + y*frame.rowstride;
+    const size_t stride = static_cast<size_t>(y) * frame.rowstride;
+    std::vector<uint8_t>::iterator prevIt = m_prevFrameData.begin() + stride;
+    uint8_t* it = frame.pixels + stride;
 
     for (int x=0; x<m_width; ++x, ++it, ++prevIt) {
       if (*prevIt != *it)
@@ -384,9 +384,9 @@ void Encoder::writeLcLineChunk(const Frame& frame, int y)
   int npackets = 0;
   int skipPixels = 0;
 
-  std::vector<uint8_t>::iterator prevIt =
-    m_prevFrameData.begin() + y*frame.rowstride;
-  uint8_t* it = frame.pixels + y*frame.rowstride;
+  const size_t stride = static_cast<size_t>(y) * frame.rowstride;
+  std::vector<uint8_t>::iterator prevIt = m_prevFrameData.begin() + stride;
+  uint8_t* it = frame.pixels + stride;
 
   for (int x=0; x<m_width; ) {
     if (*prevIt != *it) {
