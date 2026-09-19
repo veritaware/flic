@@ -1,9 +1,12 @@
-// Aseprite FLIC Library
-// Copyright (c) 2019-2025 Igara Studio S.A.
-// Copyright (c) 2015 David Capello
+// FLIC Library
+// Copyright (C) 2015      David Capello
+// Copyright (C) 2019-2025 Igara Studio S.A.
+// Copyright (C) 2026      Veritaware
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
+
+#include <algorithm> //std::fill(), not sourced by default on macOS with C++23
 
 #include "flic.h"
 #include "flic_details.h"
@@ -77,11 +80,23 @@ bool Decoder::readFrame(Frame& frame)
       break;
   }
 
+  // header.frames (the caller's loop bound) is an attacker-controlled
+  // 16-bit count independent of how much real frame data the file
+  // actually contains. Once we've run off the end of the file, reads
+  // below degrade to 0 with no error, which used to make this function
+  // report success on every remaining declared frame - looping up to
+  // 65535 times over a file with no more data. Bail out for real instead
+  // (see issue #219).
+  if (!m_file->ok())
+    return false;
+
   uint32_t frameStartPos = m_file->tell();
   uint32_t frameSize = read32();
   uint16_t magic = read16();
   assert(magic == FLI_FRAME_MAGIC_NUMBER);
-  (void)magic;
+
+  if (frameSize < 16 || magic != FLI_FRAME_MAGIC_NUMBER)
+    return false;
 
   uint16_t chunks = read16();
   for (int i=0; i<8; ++i)       // Padding
